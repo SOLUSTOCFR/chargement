@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#b34a00">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Chargement Solustoc</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header id="bar" hidden>
+  <div class="bar-left">
+    <button id="backBtn" class="icon" aria-label="Retour" hidden>←</button>
+    <div>
+      <div id="barTitle">Chargement</div>
+      <div id="barSub" class="sub"></div>
+    </div>
+  </div>
+  <div class="bar-right">
+    <button id="syncChip" class="chip" type="button">…</button>
+    <button id="menuBtn" class="icon" aria-label="Menu">⋮</button>
+  </div>
+</header>
+
+<main>
+  <!-- 1. Connexion -->
+  <section id="vLogin" class="view">
+    <h1>Inventaire chargement</h1>
+    <p class="muted">Accès réservé. Le code t'a été donné par Brice.</p>
+    <label>Ton code d'accès
+      <input id="loginCode" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="ex. Loic01">
+    </label>
+    <label>Chargement (le camion)
+      <input id="loginCh" type="text" list="chList" autocapitalize="characters" placeholder="ex. 18-11 CAMION 1">
+      <datalist id="chList"></datalist>
+    </label>
+    <button id="loginBtn" class="primary big">Commencer</button>
+    <p id="loginMsg" class="msg" role="alert"></p>
+  </section>
+
+  <!-- 2. Palettes du chargement -->
+  <section id="vList" class="view" hidden>
+    <div class="palhead row spread">
+      <div><strong id="chName"></strong> <span id="chStats" class="muted"></span></div>
+      <button type="button" id="closeChBtn" class="primary small">✔ Terminer</button>
+    </div>
+    <div id="chClosedBox" class="banner okb" hidden>✔ Chargement terminé.
+      <button type="button" id="reopenChBtn" class="link">✏️ Rouvrir pour ajouter des palettes</button></div>
+    <button type="button" id="newPalBtn" class="primary big">➕ Nouvelle palette</button>
+    <ul id="palList" class="cards"></ul>
+    <p id="palEmpty" class="muted" hidden>Aucune palette pour l'instant. Appuie sur « Nouvelle palette » et photographie la première.</p>
+  </section>
+
+  <!-- 3. Une palette -->
+  <section id="vForm" class="view" hidden>
+    <form id="palForm" autocomplete="off">
+      <div id="editBanner" class="banner" hidden>Modification d'une palette déjà saisie.
+        <button type="button" id="cancelEdit" class="link">Annuler</button></div>
+
+      <div class="photos">
+        <div id="thumbs" class="thumbs"></div>
+        <label class="photoBtn" id="photoBtn">📸 Photo de la palette <span class="muted">(avec l'étiquette bien visible)</span>
+          <input id="fPhoto" type="file" accept="image/*" capture="environment" hidden>
+        </label>
+        <label class="photoBtn light" id="photoBtnBl">📄 Photo du BL / d'un document
+          <input id="fPhotoBl" type="file" accept="image/*" capture="environment" hidden>
+        </label>
+        <label class="photoBtn light" id="photoBtnGal">🖼️ Choisir dans la galerie
+          <input id="fPhotoGal" type="file" accept="image/*" hidden>
+        </label>
+        <button type="button" id="aiBtn" class="secondary big" hidden>✨ Lire étiquette / BL (IA)</button>
+        <p id="aiMsg" class="msg" role="status"></p>
+      </div>
+
+      <label>N° de palette / étiquette
+        <div class="row gap">
+          <input id="fNum" type="text" inputmode="text" autocapitalize="characters" placeholder="Scanner ou taper">
+          <button type="button" id="scanBtn" class="secondary">📷 Scanner</button>
+        </div>
+      </label>
+
+      <div class="grid2">
+        <label>Nombre de colis <span class="muted">(si indiqué)</span>
+          <input id="fColis" type="number" inputmode="numeric" min="0" step="1">
+        </label>
+        <label>Réf. BL
+          <input id="fBl" type="text" autocapitalize="characters">
+        </label>
+      </div>
+
+      <label>Client / destinataire
+        <input id="fDest" type="text">
+      </label>
+
+      <label>Contenu <span class="muted">(facultatif)</span>
+        <textarea id="fContenu" rows="2" placeholder="Ce qui est écrit sur la palette ou le BL"></textarea>
+      </label>
+
+      <label>Commentaire <span class="muted">(filmée, abîmée, incomplète…)</span>
+        <input id="fComment" type="text">
+      </label>
+
+      <p id="palMsg" class="msg" role="alert"></p>
+      <button type="submit" id="saveBtn" class="primary big">Enregistrer et palette suivante</button>
+    </form>
+  </section>
+</main>
+
+<p id="ver" class="muted small center" style="margin:0 0 24px">Version 1</p>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<dialog id="scanDlg">
+  <div id="reader"></div>
+  <p id="scanMsg" class="muted center">Place le code-barres dans le cadre.</p>
+  <button id="scanClose" class="secondary big">Fermer</button>
+</dialog>
+
+<dialog id="cropDlg">
+  <h3 style="margin-top:0">Cadre la photo</h3>
+  <p class="muted small">Déplace le cadre ou tire sur les coins pour ne garder que l'utile (ou garde la photo entière).</p>
+  <div class="cropbox"><div id="cropWrap"><img id="cropImg" alt="">
+    <div id="cropRect"><i class="h tl" data-h="tl"></i><i class="h tr" data-h="tr"></i><i class="h bl" data-h="bl"></i><i class="h br" data-h="br"></i></div>
+  </div></div>
+  <button id="cropOk" type="button" class="primary big">✔ Valider le cadrage</button>
+  <button id="cropFull" type="button" class="secondary big">Garder la photo entière</button>
+  <button id="cropCancel" type="button" class="link big">Annuler</button>
+</dialog>
+
+<dialog id="menuDlg">
+  <h3>Menu</h3>
+  <button id="mSync" class="secondary big">Envoyer maintenant</button>
+  <button id="mCsv" class="secondary big">Sauvegarde sur le téléphone (CSV)</button>
+  <button id="mDelCh" class="secondary big">🗑 Supprimer ce chargement</button>
+  <button id="mLogout" class="secondary big">Changer de personne / de chargement</button>
+  <button id="mClose" class="link big">Fermer</button>
+  <p class="muted small" id="mInfo"></p>
+</dialog>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

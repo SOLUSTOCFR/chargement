@@ -1,0 +1,16 @@
+{
+  "name": "Chargement Solustoc",
+  "short_name": "Chargement",
+  "description": "Inventaire de chargement : photo de chaque palette, étiquette, BL.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#b34a00",
+  "theme_color": "#b34a00",
+  "lang": "fr",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
