@@ -210,7 +210,9 @@
     photos.forEach(function (p, i) {
       var d = document.createElement("div"); d.className = "thumb";
       var im = document.createElement("img"); im.src = p.url; im.alt = "photo " + (i + 1);
-      var k = document.createElement("span"); k.className = "kind"; k.textContent = p.kind === "BL" ? "BL" : "Palette";
+      var k = document.createElement("span"); k.className = "kind";
+      var blIdx = photos.slice(0, i + 1).filter(function (x) { return x.kind === "BL"; }).length;
+      k.textContent = p.kind === "BL" ? "BL p." + blIdx : "Palette";
       var b = document.createElement("button"); b.type = "button"; b.textContent = "×"; b.setAttribute("aria-label", "Retirer la photo");
       b.onclick = function () { URL.revokeObjectURL(p.url); photos.splice(i, 1); renderThumbs(); };
       d.appendChild(im); d.appendChild(k); d.appendChild(b); $("thumbs").appendChild(d);
@@ -218,7 +220,7 @@
     $("aiBtn").hidden = !CFG.SCRIPT_URL;
     $("aiBtn").disabled = photos.length < 1;
     $("aiBtn").textContent = photos.length < 1 ? "✨ Lire étiquette / BL (IA) — prends d'abord une photo" : "✨ Lire étiquette / BL (IA)";
-    var full = photos.length >= (CFG.MAX_PHOTOS || 5);
+    var full = photos.length >= (CFG.MAX_PHOTOS || 12);
     ["photoBtn", "photoBtnBl", "photoBtnGal"].forEach(function (id) { $(id).classList.toggle("disabled", full); });
   }
 
@@ -226,7 +228,7 @@
     return function (ev) {
       var f = ev.target.files && ev.target.files[0]; ev.target.value = "";
       if (!f) return;
-      if (photos.length >= (CFG.MAX_PHOTOS || 5)) { toast("Maximum " + (CFG.MAX_PHOTOS || 5) + " photos."); return; }
+      if (photos.length >= (CFG.MAX_PHOTOS || 12)) { toast("Maximum " + (CFG.MAX_PHOTOS || 12) + " photos."); return; }
       pendingKind = kind; openCrop(f);
     };
   }
